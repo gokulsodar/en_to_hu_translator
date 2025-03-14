@@ -50,7 +50,18 @@ pip install torch transformers datasets optuna numpy scikit-learn
    - Train final model with optimized settings
    - Evaluate and test translations
 
-## Example Translation
+## Local Testing
+
+If you want to use the pre-trained model locally:
+
+1. Download the model files from Hugging Face (excluding the README.md) and store them in a folder called `t5-small-hungarian-translator`
+2. Install the necessary libraries:
+```
+pip install torch transformers
+```
+3. Use the model with the provided `testing.py` script (or create one using the example below)
+
+## testing.py
 
 ```python
 from transformers import AutoTokenizer, T5ForConditionalGeneration
@@ -67,8 +78,8 @@ def translate(text):
     return loaded_tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 # Test translation with a sample sentence
-sample_text = "I love literature."
-translated_text = translate(sample_text)    
+text = input()
+translated_text = translate(text)    
 
 print(f"English: {sample_text}")
 print(f"Hungarian: {translated_text}")
