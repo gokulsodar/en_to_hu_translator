@@ -12,8 +12,8 @@ def translate(text):
     return loaded_tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 # Test translation with a sample sentence
-sample_text = "I love literature."
-translated_text = translate(sample_text)    
+text = input()
+translated_text = translate(text)    
 
 print(f"English: {sample_text}")
 print(f"Hungarian: {translated_text}")
