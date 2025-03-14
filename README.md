@@ -1,116 +1,75 @@
-# English to Hungarian T5-small Translation Model
+# English to Hungarian Translation with T5-Small
 
-This project fine-tunes the T5-small model on English-Hungarian translation data using the `opus_books` dataset. It includes hyperparameter optimization with Optuna and provides a streamlined workflow for training and evaluating neural machine translation models.
+This repository contains code for fine-tuning a T5-small model on English to Hungarian translation tasks using the OPUS Books dataset.
 
-## Features
+## Model
 
-- Fine-tuning T5-small for English to Hungarian translation
-- Hyperparameter optimization using Optuna
-- TensorBoard integration for training visualization
-- Mixed precision training support for GPU acceleration
-- Complete pipeline from data preprocessing to model evaluation
+The fine-tuned model is too large to be stored on GitHub, so it is hosted on Hugging Face:
 
-## Requirements
+[https://huggingface.co/anonymus16/en-to-hu_finetuned-t5-small] <!-- Add your Hugging Face link here -->
 
-```
-torch
-transformers
-datasets
-optuna
-numpy
-sklearn
-tensorboard
-```
+## Dataset & Training
 
-## Dataset
+Training was performed on an NVIDIA P100 GPU via Kaggle:
 
-This project uses the `opus_books` dataset (English-Hungarian split) from Hugging Face's datasets library. The dataset consists of translations from books and literature, providing a diverse vocabulary for training.
+[https://www.kaggle.com/code/gokulsodar/t5-eng-to-hu] <!-- Add your Kaggle notebook link here -->
+
+## Training Details
+
+- Base model: t5-small
+- Dataset: OPUS Books English-Hungarian parallel corpus
+- Mixed precision (FP16) training for optimized performance
+- Hyperparameter optimization with Optuna
+- Training progress monitored with TensorBoard
+
+## Libraries Used
+
+- PyTorch
+- Transformers
+- Datasets
+- Optuna
+- NumPy
+- Scikit-learn
 
 ## Project Structure
 
-- **Data Loading**: Load and preprocess the English-Hungarian translation dataset
-- **Tokenization**: Prepare the data using T5's tokenizer with task-specific prefixes
-- **Hyperparameter Optimization**: Use Optuna to find optimal training parameters
-- **Model Training**: Train the T5 model using the best hyperparameters
-- **Evaluation**: Test the model with sample translations
+- `en_hu_translation.ipynb`: Main notebook containing all training code
+- Training leverages HuggingFace's Trainer API with cosine learning rate scheduler with restarts
+- TensorBoard logging to monitor training metrics
 
 ## Usage
 
-### 1. Setup Environment
-
-Create a Python environment with the required packages:
-
-```bash
-conda create -n translation-env python=3.10
-conda activate translation-env
-pip install torch transformers datasets optuna scikit-learn tensorboard
+1. Install dependencies:
+```
+pip install torch transformers datasets optuna numpy scikit-learn
 ```
 
-### 2. Run the Notebook
+2. Run the notebook to:
+   - Load and preprocess the English-Hungarian dataset
+   - Optimize hyperparameters with Optuna
+   - Train final model with optimized settings
+   - Evaluate and test translations
 
-The entire process is contained in the Jupyter notebook. Each cell is clearly labeled with its purpose:
-
-- `import-libraries`: Load necessary Python libraries
-- `load-dataset`: Import the English-Hungarian dataset
-- `preprocess-data`: Tokenize and prepare data for training
-- `optuna-objective`: Define the hyperparameter search space
-- `run-optuna`: Execute hyperparameter optimization
-- `final-training`: Train the model with optimal parameters
-- `evaluate-model`: Test the model with example translations
-
-### 3. Custom Translation
-
-After training, you can use the `translate_text()` function to translate your own text:
-
-```python
-sample_text = "I would like to visit Budapest someday."
-translated_text = translate_text(sample_text)
-print(f"English: {sample_text}")
-print(f"Hungarian: {translated_text}")
-```
-
-## Hyperparameters
-
-The optimization process tunes the following hyperparameters:
-
-- Learning rate
-- Warmup steps
-- Gradient accumulation steps
-- Weight decay
-- Batch size
-
-## Performance Monitoring
-
-Training progress can be monitored through TensorBoard:
-
-```bash
-tensorboard --logdir=./t5-small-translation-tensorboard
-```
-
-## Model Saving & Loading
-
-The final model is saved to the `./t5-small-translation-final` directory and can be loaded for inference:
+## Example Translation
 
 ```python
 from transformers import AutoTokenizer, T5ForConditionalGeneration
 
-tokenizer = AutoTokenizer.from_pretrained("./t5-small-translation-final")
-model = T5ForConditionalGeneration.from_pretrained("./t5-small-translation-final")
+model_path = "t5-small-hungarian-translator"
+loaded_model = T5ForConditionalGeneration.from_pretrained(model_path)
+loaded_tokenizer = AutoTokenizer.from_pretrained(model_path)
+
+# Then use it for translation
+def translate(text):
+    input_text = "translate English to Hungarian: " + text
+    inputs = loaded_tokenizer(input_text, return_tensors="pt", max_length=128, truncation=True)
+    outputs = loaded_model.generate(**inputs, max_length=128, num_beams=4, early_stopping=True)
+    return loaded_tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+# Test translation with a sample sentence
+sample_text = "I love literature."
+translated_text = translate(sample_text)    
+
+print(f"English: {sample_text}")
+print(f"Hungarian: {translated_text}")
 ```
-
-## Future Improvements
-
-- Increase training data with additional Hungarian-English datasets
-- Experiment with larger T5 variants (T5-base, T5-large)
-- Implement more sophisticated evaluation metrics (BLEU, ROUGE)
-- Add model quantization for faster inference
-- Create a simple web interface for demo purposes
-
-## License
-
-[MIT License]
-
-## Acknowledgments
-
-- Hugging Face for the Transformers library and datasets
-- OPUS project for the translation data
