@@ -1,0 +1,1 @@
+The model files are supposed to be inside this folder but they were too big to be uploaded on github. They have been uploaded in the hugging face link given in README.md
